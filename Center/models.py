@@ -10,7 +10,7 @@ class User (AbstractUser):
         ('DELIVERER', 'Deliverer')
     ]
 
-    roles = models.CharField(max_length=50)
+    role = models.CharField(max_length=50)
 
     def __str__(self):
         return f"Welcome,{self.username}"
@@ -26,9 +26,17 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
+class Admin(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="admin_profile")
+    phone = models.CharField(max_length=20,unique=True)
+    profile_image= models.ImageField(upload_to='Admin/profiles/', null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} created."
+
 class Customer(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="customer_profile", null=True)
+    phone = models.CharField(max_length=20,unique=True)
     address = models.TextField()
     profile_image= models.ImageField(upload_to='Customer/profiles/', null=True, blank=True)
 
@@ -37,9 +45,10 @@ class Customer(BaseModel):
         return self.user.username
 
 class Deliverer(BaseModel):
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="deliverer_profile", null=True,blank=True)
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=20)
-    assigned_order=models.ForeignKey(Customer)
+    phone = models.CharField(max_length=20,unique=True)
+    assigned_order=models.ForeignKey(Customer, on_delete=models.CASCADE)
     available = models.BooleanField(default=True)
     profile_image= models.ImageField(upload_to='Deliverer/profiles/', null=True, blank=True)
 
@@ -93,7 +102,7 @@ class OrderItem(BaseModel):
 
     @property
     def subtotal(self):
-        return self.quantity * self.unit_price
+        return self.product-self.quantity * self.unit_price
     
 
 class Payment(BaseModel):
@@ -109,7 +118,7 @@ class Payment(BaseModel):
         ("failed", "Failed"),
     ]
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

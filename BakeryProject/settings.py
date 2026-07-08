@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+AUTH_USER_MODEL ='Center.User'
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
     # Dependancies
     'rest_framework',
-    'rest_framework_simplejwt.tokenblacklist',
+    'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -92,8 +92,8 @@ WSGI_APPLICATION = 'BakeryProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'maziwasyncdb',
-        'HOST': 'localhost',
+        'NAME': 'Bakerydb',
+        'HOST': '127.0.0.1',
         'USER' : 'root',
         'PASSWORD':'',
     }
@@ -140,3 +140,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.IsAuthenticated',),
+    'DEFAULT_SCHEMA_CLASS':'drf_spectacular.openapi.AutoSchema',
+}
