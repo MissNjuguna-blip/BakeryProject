@@ -52,14 +52,14 @@ def SignUp(request):
                 address=request.data.get("address")
                 
             )
-        elif role == 'deliverer':
-            Deliverer.objects.create(
-                user=user,
-                first_name=request.data.get("first_name"),
-                last_name=request.data.get("last_name"),
-                assigned_order=request.data.get("assigned_order")
+        # elif role == 'deliverer':
+        #     Deliverer.objects.create(
+        #         user=user,
+        #         first_name=request.data.get("first_name"),
+        #         last_name=request.data.get("last_name"),
+        #         assigned_order=request.data.get("assigned_order")
     
-            )
+        #     )
 
         return Response({
             "user_id":user.id,
@@ -84,7 +84,6 @@ def Login(Request):
     user = authenticate(username=username, password=password)
     if not user:
         return Response({"error":"Invalid Credentials"})
-    
     refresh=RefreshToken.for_user(user)
     return Response ({
         "username":user.username,
