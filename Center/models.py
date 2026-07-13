@@ -68,7 +68,7 @@ class Product(BaseModel):
     name = models.CharField(max_length=150)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.CharField(max_length=1000)
+    image = models.ImageField(upload_to='products/')
     available = models.BooleanField(default=True)
 
     def __str__(self):
@@ -113,17 +113,22 @@ class Payment(BaseModel):
     ]
 
     STATUS = [
-        ("pending", "Pending"),
-        ("paid", "Paid"),
-        ("failed", "Failed"),
+    ("pending", "Pending"),
+    ("processing", "Processing"),
+    ("paid", "Paid"),
+    ("failed", "Failed"),
+    ("cancelled", "Cancelled"),
+    ("refunded", "Refunded"),
     ]
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_id = models.CharField(max_length=100, blank=True)
+    transaction_id = models.CharField(max_length=100, blank=True,unique=True)
     status = models.CharField(max_length=20, choices=STATUS, default="pending")
+    paid_at = models.DateTimeField(null=True, blank=True)
+
 
     def __str__(self):
         return f"{self.order} - {self.status}"

@@ -16,8 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.conf.urls.static import static
+from django.conf import settings
+from drf_spectacular.views import SpectacularAPIView,SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/Center/', include('Center.urls'))
+
+     # ai documentation
+    path('api/schema/', SpectacularAPIView.as_view(),name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name = 'schema'), name = 'swagger-ui'),
+
+    path('api/center/', include('Center.urls')),
+    # path('api/Orders/', include('Orders.urls')),
+    path('api/payments/', include('Payments.urls')),
+    path('api/products/', include('Products.urls')),
+    path('api/admin/', include('Admin.urls')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
