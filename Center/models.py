@@ -90,6 +90,15 @@ class Order(BaseModel):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     delivery_address = models.TextField()
+    delivered_at = models.DateTimeField(null=True,blank=True)
+
+    def update_total(self):
+        self.total_amount = sum(
+            item.quantity * item.unit_price
+            for item in self.items.all()
+        )
+        self.save(update_fields=["total_amount"])
+
 
     def __str__(self):
         return f"Order #{self.id}"
@@ -102,7 +111,7 @@ class OrderItem(BaseModel):
 
     @property
     def subtotal(self):
-        return self.product-self.quantity * self.unit_price
+        return self.quantity * self.unit_price
     
 
 class Payment(BaseModel):
