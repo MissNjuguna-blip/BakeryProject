@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
-<<<<<<< Updated upstream
 from rest_framework import viewsets,status
 from Admin.serializer import CategorySerializer,AssignDelivererSerializer,DelivererCreateSerializer
 from Center.models import Category
@@ -144,7 +143,3 @@ class AssignDelivererView(APIView):
                 )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-=======
-
-# Create your views here.
->>>>>>> Stashed changes
