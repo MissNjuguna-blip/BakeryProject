@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
@@ -44,3 +45,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
 
         serializer.save()
+=======
+from django.shortcuts import render
+
+# Create your views here.
+>>>>>>> Stashed changes

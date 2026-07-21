@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from Center.models import Deliverer,Order
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -36,3 +37,9 @@ class DelivererDashboard(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+=======
+from django.shortcuts import render
+
+# Create your views here.
+
+>>>>>>> Stashed changes

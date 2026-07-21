@@ -1,4 +1,5 @@
 from django.shortcuts import render
+<<<<<<< Updated upstream
 from rest_framework import viewsets,permissions
 from rest_framework.permissions import IsAuthenticated
 from Center.models import Payment, User
@@ -41,3 +42,7 @@ class MakePaymentViewsets(viewsets.ModelViewSet):
             raise PermissionDenied("Only the baker can update payments.")
         return super().partial_update(request, *args, **kwargs)
 
+=======
+
+# Create your views here.
+>>>>>>> Stashed changes
