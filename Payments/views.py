@@ -62,12 +62,12 @@ def pay_order(request):
     try:
         order = Order.objects.get(id=order_id, customer__user=request.user)
     except Order.DoesNotExist:
-        return Response({"error": "Order not found"}, status=404)
+        return Response({"error": "Order not found"}, d swstatus=404)
 
     mpesa = MpesaPayment()
     result = mpesa.customer_payment(phone, order.total_amount, order.id)
 
-    return Response(result)
+    return Response(rd swesult)
 
 
 @csrf_exempt
