@@ -49,6 +49,7 @@ class Deliverer(BaseModel):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20,unique=True)
     # assigned_order=models.ForeignKey(Customer, on_delete=models.CASCADE)
+    assigned_order=models.ForeignKey(Customer, on_delete=models.CASCADE)
     available = models.BooleanField(default=True)
     profile_image= models.ImageField(upload_to='Deliverer/profiles/', null=True, blank=True)
 

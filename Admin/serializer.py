@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from Center.models import Category,Deliverer
+from Center.models import Category,Deliverer,User
 
 class CategorySerializer (serializers.ModelSerializer):
     class Meta:
@@ -48,7 +48,7 @@ class DelivererCreateSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=username,
             email=email,
-            password=make_password(password),
+            password=password(password),
             role="DELIVERER",
         )
 
