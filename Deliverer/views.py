@@ -1,9 +1,9 @@
-<<<<<<< Updated upstream
 from Center.models import Deliverer,Order
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from Deliverer.serializer import OrderSerializer
 
 
 
@@ -37,9 +37,42 @@ class DelivererDashboard(APIView):
                 {"error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-=======
-from django.shortcuts import render
 
-# Create your views here.
+class DelivererOrders(APIView):
+        permission_classes = [IsAuthenticated]
 
->>>>>>> Stashed changes
+def get(self, request):
+        try:
+            deliverer = request.user.deliverer_profile
+
+            orders = Order.objects.filter(deliverer=deliverer)
+            serializer = OrderSerializer(orders, many=True)
+
+            return Response(serializer.data)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class AddOrder(APIView):
+        permission_classes = [IsAuthenticated]
+
+def post(self, request):
+        serializer = OrderSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Order created successfully.",
+                    "order": serializer.data
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )

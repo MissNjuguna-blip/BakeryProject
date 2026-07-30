@@ -28,7 +28,7 @@ class BaseModel(models.Model):
 
 class Admin(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="admin_profile")
-    phone = models.CharField(max_length=20,unique=True)
+    phone = models.CharField(max_length=20,unique=True, blank=True, null=True)
     profile_image= models.ImageField(upload_to='Admin/profiles/', null=True, blank=True)
 
     def __str__(self):
@@ -45,11 +45,11 @@ class Customer(BaseModel):
         return self.user.username
 
 class Deliverer(BaseModel):
-    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="deliverer_profile", null=True,blank=True)
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="deliverer_profile")
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20,unique=True)
     # assigned_order=models.ForeignKey(Customer, on_delete=models.CASCADE)
-    assigned_order=models.ForeignKey(Customer, on_delete=models.CASCADE)
+    assigned_order=models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     available = models.BooleanField(default=True)
     profile_image= models.ImageField(upload_to='Deliverer/profiles/', null=True, blank=True)
 
@@ -115,6 +115,35 @@ class OrderItem(BaseModel):
         return self.quantity * self.unit_price
     
 
+# class Payment(BaseModel):
+#     PAYMENT_METHODS = [
+#         ("cash", "Cash"),
+#         ("card", "Card"),
+#         ("mpesa", "M-Pesa"),
+#     ]
+
+#     STATUS = [
+#     ("pending", "Pending"),
+#     ("processing", "Processing"),
+#     ("paid", "Paid"),
+#     ("failed", "Failed"),
+#     ("cancelled", "Cancelled"),
+#     ("refunded", "Refunded"),
+#     ]
+
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     order = models.ForeignKey(Order, on_delete=models.CASCADE)
+#     method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     transaction_id = models.CharField(max_length=100, blank=True,unique=True)
+#     status = models.CharField(max_length=20, choices=STATUS, default="pending")
+#     paid_at = models.DateTimeField(null=True, blank=True)
+
+
+#     def __str__(self):
+#         return f"{self.order} - {self.status}"
+
+
 class Payment(BaseModel):
     PAYMENT_METHODS = [
         ("cash", "Cash"),
@@ -123,25 +152,28 @@ class Payment(BaseModel):
     ]
 
     STATUS = [
-    ("pending", "Pending"),
-    ("processing", "Processing"),
-    ("paid", "Paid"),
-    ("failed", "Failed"),
-    ("cancelled", "Cancelled"),
-    ("refunded", "Refunded"),
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("paid", "Paid"),
+        ("failed", "Failed"),
+        ("cancelled", "Cancelled"),
+        ("refunded", "Refunded"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     method = models.CharField(max_length=20, choices=PAYMENT_METHODS)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_id = models.CharField(max_length=100, blank=True,unique=True)
+    transaction_id = models.CharField(max_length=100, blank=True, unique=True)
+    checkout_request_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    merchant_request_id = models.CharField(max_length=100, blank=True, null=True)
+    result_desc = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS, default="pending")
     paid_at = models.DateTimeField(null=True, blank=True)
 
-
     def __str__(self):
         return f"{self.order} - {self.status}"
+
 
 class Gallery(BaseModel):
     title = models.CharField(max_length=100)

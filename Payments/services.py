@@ -37,12 +37,9 @@ class MpesaPayment:
         )
 
         # Sandbox Shortcode & Passkey
-        self.shortcode = "600983"
+        self.shortcode = "174379"
 
-        self.passkey = (
-            "bfb279f9aa9bdbcf158e97dd71a467cd"
-            "2e0c893059b10f78e6b72ada1ed2c919"
-        )
+        self.passkey = ("bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919")
 
     def get_token(self):
         response = requests.get(
@@ -96,6 +93,7 @@ class MpesaPayment:
         return response.json()
 
     def customer_payment(self, phone, amount, order_id):
+        print(f" phone:{phone}  amount: {amount} orderid:{order_id}" )
         print("Customer Payment Function")
 
         token = self.get_token()
@@ -120,7 +118,7 @@ class MpesaPayment:
             "Password": password,
             "Timestamp": timestamp,
             "TransactionType": "CustomerPayBillOnline",
-            "Amount": int(amount),
+            "Amount": "1",
             "PartyA": phone,
             "PartyB": self.shortcode,
             "PhoneNumber": phone,

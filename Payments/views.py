@@ -55,31 +55,107 @@ class MakePaymentViewsets(viewsets.ModelViewSet):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def pay_order(request):
-    """Initiate STK push to customer's phone"""
-    order_id = request.data.get("order_id")
+    order_id_frnt = request.data.get("order_id")
     phone = request.data.get("phone")
 
     try:
-        order = Order.objects.get(id=order_id, customer__user=request.user)
+        order = Order.objects.get(id=order_id_frnt, customer__user=request.user)
     except Order.DoesNotExist:
-        return Response({"error": "Order not found"}, d swstatus=404)
+        return Response({"error": "Order not found"}, status=404)
 
     mpesa = MpesaPayment()
     result = mpesa.customer_payment(phone, order.total_amount, order.id)
 
-    return Response(rd swesult)
+    checkout_request_id = result.get("CheckoutRequestID")
+    merchant_request_id = result.get("MerchantRequestID")
+    from django.db import transaction
 
+    if checkout_request_id:
+        with transaction.atomic():
+            Payment.objects.filter(order=order, status="processing").update(status="cancelled")
+
+            Payment.objects.create(
+                user=request.user,
+                order=order,
+                method="mpesa",
+                amount=order.total_amount,
+                checkout_request_id=checkout_request_id,
+                merchant_request_id=merchant_request_id,
+                status="processing",
+            )
+        return Response(result, status=200)
+    # STK push failed to even initiate — nothing to track, just report the error
+    return Response(result, status=502)
+
+
+from django.utils import timezone
 
 @csrf_exempt
 def stk_callback(request):
-    """Safaricom sends STK push result here"""
     try:
         data = json.loads(request.body)
+        print(data)
     except json.JSONDecodeError:
         return JsonResponse({"ResultCode": 1, "ResultDesc": "Invalid payload"})
+
     print("========== STK CALLBACK ==========")
     print(json.dumps(data, indent=2))
+
+    try:
+        stk_callback = data["Body"]["stkCallback"]
+        checkout_request_id = stk_callback["CheckoutRequestID"]
+        result_code = stk_callback["ResultCode"]
+        result_desc = stk_callback.get("ResultDesc", "")
+    except KeyError:
+        return JsonResponse({"ResultCode": 1, "ResultDesc": "Malformed payload"})
+
+    try:
+        payment = Payment.objects.get(checkout_request_id=checkout_request_id)
+    except Payment.DoesNotExist:
+        # Acknowledge anyway so Safaricom doesn't keep retrying
+        return JsonResponse({"ResultCode": 0, "ResultDesc": "Payment not found, acknowledged"})
+
+    payment.result_desc = result_desc
+
+    if result_code == 0:
+        items = stk_callback["CallbackMetadata"]["Item"]
+        meta = {item["Name"]: item.get("Value") for item in items}
+
+        payment.status = "paid"
+        payment.transaction_id = meta.get("MpesaReceiptNumber")
+        payment.paid_at = timezone.now()
+        payment.save()
+
+        # Keep the order status in sync
+        order = payment.order
+        order.status = "received"
+        order.save(update_fields=["status"])
+    else:
+        payment.status = "failed"
+        payment.save()
+        print(f"Payment failed for order {payment.order.id}: {result_desc}")
+
+    # Always return 0/200, or Safaricom will keep retrying the callback
     return JsonResponse({"ResultCode": 0, "ResultDesc": "Success"})
+
+
+# happens async in the background, your frontend needs something to poll after showing "check your phone":
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def payment_status(request, order_id):
+    try:
+        payment = Payment.objects.filter(
+            order_id=order_id, order__customer__user=request.user
+        ).latest("created_at")
+    except Payment.DoesNotExist:
+        return Response({"status": "not_found"}, status=404)
+
+    return Response({
+        "status": payment.status,
+        "transaction_id": payment.transaction_id,
+        "result_desc": payment.result_desc,
+    })
+
 
 
 @api_view(["POST"])

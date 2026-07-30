@@ -15,11 +15,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-<<<<<<< Updated upstream
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-=======
->>>>>>> Stashed changes
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -30,7 +27,16 @@ SECRET_KEY = 'django-insecure-(d+h1-3la5%=h2czkpn^1(9=qa0o59$t+&97usf!588bf8q1l0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "extrude-defeat-dirtiness.ngrok-free.dev",
+    "localhost","127.0.0.1",
+    "virginiaemp.alwaysdata.net"
+]
+
+CORS_ALLOWED_ORIGINS=[
+    "http://localhost:5173",
+    "http://127.0.0.1:8000"
+]
 
 AUTH_USER_MODEL ='Center.User'
 # Application definition
@@ -57,10 +63,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     
-<<<<<<< Updated upstream
     
-=======
->>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
@@ -101,10 +104,10 @@ WSGI_APPLICATION = 'BakeryProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Bakerydb',
-        'HOST': '127.0.0.1',
-        'USER' : 'root',
-        'PASSWORD':'',
+        'NAME': 'virginiaemp_bakerydb',
+        'HOST': 'mysql-virginiaemp.alwaysdata.net',
+        'USER' : 'virginiaemp',
+        'PASSWORD':'Modcom2026',
     }
 }
 
@@ -154,4 +157,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
     'DEFAULT_PERMISSION_CLASSES':('rest_framework.permissions.IsAuthenticated',),
     'DEFAULT_SCHEMA_CLASS':'drf_spectacular.openapi.AutoSchema',
+}
+
+# JWT SETTINGS 
+from datetime import timedelta
+SIMPLE_JWT={
+    'ACCESS_TOKEN_LIFETIME':timedelta(days=30),
+    'REFRESH_TOKEN_LIFETIME':timedelta(days=60),
+    
+    'ROTATE_REFRESH_TOKEN':True,
+    'BLACKLIST_AFTER_ROTATION':True,
 }

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import MakePaymentViewsets, pay_order, stk_callback, pay_deliverer, b2c_callback
+from .views import MakePaymentViewsets, pay_order, stk_callback, pay_deliverer, b2c_callback,payment_status
 
 router = DefaultRouter()
 router.register("payments", MakePaymentViewsets, basename="payments")
@@ -13,4 +13,6 @@ urlpatterns = [
     path('pay-deliverer/', pay_deliverer),
     path('stk/callback', stk_callback, name='stk_callback'),
     path('b2c/callback', b2c_callback),
+    
+    path("api/payments/status/<int:order_id>/", payment_status, name="payment-status"),
 ]

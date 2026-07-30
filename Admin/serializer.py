@@ -48,7 +48,7 @@ class DelivererCreateSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=username,
             email=email,
-            password=password(password),
+            password=password,
             role="DELIVERER",
         )
 
