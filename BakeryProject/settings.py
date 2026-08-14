@@ -32,13 +32,16 @@ ALLOWED_HOSTS = [
     "localhost","127.0.0.1",
     "msql-virginiabakery.alwaysdata.net",
     "virginiabakery.alwaysdata.net",
+    "bakeryfrontend-chi.vercel.app",
+    "https://bakery-frnt.vercel.app"
     # "virginiaemp",
 ]
 
 CORS_ALLOWED_ORIGINS=[
     "http://localhost:5173",
     "http://127.0.0.1:8000",
-    "https://virginiabakery.alwaysdata.net"
+    "https://virginiabakery.alwaysdata.net",
+    "https://bakery-frnt.vercel.app"
 ]
 
 AUTH_USER_MODEL ='Center.User'
