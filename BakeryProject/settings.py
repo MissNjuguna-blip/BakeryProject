@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [
     "extrude-defeat-dirtiness.ngrok-free.dev",
     "localhost","127.0.0.1",
     "msql-virginiabakery.alwaysdata.net",
-    # "virginiaemp.alwaysdata.net",
+    "virginiabakery.alwaysdata.net",
     # "virginiaemp",
 ]
 
