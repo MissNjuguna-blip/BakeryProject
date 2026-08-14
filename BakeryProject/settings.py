@@ -30,7 +30,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "extrude-defeat-dirtiness.ngrok-free.dev",
     "localhost","127.0.0.1",
-    "msql-virginiaemp.alwaysdata.net",
+    "msql-virginiabakery.alwaysdata.net",
     # "virginiaemp.alwaysdata.net",
     # "virginiaemp",
 ]
@@ -38,7 +38,7 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS=[
     "http://localhost:5173",
     "http://127.0.0.1:8000",
-    "https://virginiaemp.alwaysdata.net"
+    "https://virginiabakery.alwaysdata.net"
 ]
 
 AUTH_USER_MODEL ='Center.User'
@@ -109,9 +109,9 @@ WSGI_APPLICATION = 'BakeryProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'virginiaemp_bakerydb',
-        'HOST': 'mysql-virginiaemp.alwaysdata.net',
-        'USER' : 'virginiaemp',
+        'NAME': 'virginiabakery_bakerydb',
+        'HOST': 'mysql-virginiabakery.alwaysdata.net',
+        'USER' : 'virginiabakery',
         'PASSWORD':'Modcom2026',
     }
 }
