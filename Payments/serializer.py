@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from Center.models import Payment
 from Center.models import Order
+from Center.models import Payment
 
-# make payment
+
 class PaymentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -11,8 +11,8 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
     def validate_order(self, order):
         request = self.context["request"]
 
-        # Ensure the order belongs to the logged-in user
-        if order.user != request.user:
+        # Make sure the order belongs to the logged-in user
+        if order.customer.user != request.user:
             raise serializers.ValidationError(
                 "You can only pay for your own orders."
             )
@@ -38,8 +38,8 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
         )
 
         return payment
-    
-# view payments
+
+
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -55,8 +55,49 @@ class PaymentSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
-# allow admin to update status
+
 class AdminPaymentSerializer(serializers.ModelSerializer):
+    customer_name = serializers.SerializerMethodField()
+    customer_email = serializers.SerializerMethodField()
+    order_total = serializers.SerializerMethodField()
+    order_status = serializers.SerializerMethodField()
+
     class Meta:
         model = Payment
-        fields = "__all__"
+        fields = [
+            "id",
+            "order",
+            "customer_name",
+            "customer_email",
+            "order_total",
+            "order_status",
+            "method",
+            "amount",
+            "transaction_id",
+            "checkout_request_id",
+            "merchant_request_id",
+            "result_desc",
+            "status",
+            "paid_at",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_customer_name(self, obj):
+        try:
+            user = obj.order.customer.user
+            return user.get_full_name() or user.username
+        except AttributeError:
+            return "Unknown customer"
+
+    def get_customer_email(self, obj):
+        try:
+            return obj.order.customer.user.email
+        except AttributeError:
+            return ""
+
+    def get_order_total(self, obj):
+        return obj.order.total_amount
+
+    def get_order_status(self, obj):
+        return obj.order.status

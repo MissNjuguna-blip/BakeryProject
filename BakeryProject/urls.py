@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/admin/', include('Admin.urls')),
     path('api/customer/', include('Customer.urls')),
     path('api/deliverer/', include('Deliverer.urls')),
+    path('api/favorite/', include('Favorite.urls')),
 ]
 
 if settings.DEBUG:

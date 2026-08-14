@@ -13,6 +13,7 @@ urlpatterns = [
     path('pay-deliverer/', pay_deliverer),
     path('stk/callback', stk_callback, name='stk_callback'),
     path('b2c/callback', b2c_callback),
-    
+    # path("pay-deliverer/",pay_deliverer,name="pay-deliverer"),
+
     path("api/payments/status/<int:order_id>/", payment_status, name="payment-status"),
 ]

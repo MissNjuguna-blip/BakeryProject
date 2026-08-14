@@ -101,13 +101,15 @@ WSGI_APPLICATION = 'BakeryProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'virginiaemp_bakerydb',
-        'HOST': 'mysql-virginiaemp.alwaysdata.net',
-        'USER' : 'virginiaemp',
-        'PASSWORD':'Modcom2026',
+        'NAME': 'bakerydb',
+        'HOST': 'localhost',
+        'USER' : 'root',
+        'PASSWORD':'',
     }
 }
 

@@ -16,8 +16,8 @@ class AssignDelivererSerializer(serializers.Serializer):
         except Deliverer.DoesNotExist:
             raise serializers.ValidationError("Deliverer does not exist.")
 
-        if not deliverer.available:
-            raise serializers.ValidationError("Deliverer is currently unavailable.")
+        # if not deliverer.available:
+        #     raise serializers.ValidationError("Deliverer is currently unavailable.")
 
         return value
     
@@ -41,21 +41,35 @@ class DelivererCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+
         username = validated_data.pop("username")
         email = validated_data.pop("email")
         password = validated_data.pop("password")
 
-        user = User.objects.create(
+        user = User.objects.create_user(
             username=username,
             email=email,
             password=password,
-            role="DELIVERER",
+            role="DELIVERER"
         )
 
         deliverer = Deliverer.objects.create(
             user=user,
-            available=True,
             **validated_data
         )
-
         return deliverer
+
+# Get a deliverer
+class DelivererSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True
+    )
+
+    class Meta:
+        model = Deliverer
+        fields = [
+            "id",
+            "name",
+            "username",
+        ]

@@ -5,6 +5,7 @@ from Center.models import Product
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source="product.name")
+    product_image = serializers.ImageField(source="product.image", read_only=True)
     subtotal = serializers.ReadOnlyField()
 
     class Meta:
@@ -13,10 +14,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "id",
             "product",
             "product_name",
+            "product_image",
             "quantity",
             "unit_price",
             "subtotal",
         ]
+
+        def get_product_image(self, obj):
+            request = self.context.get("request")
+            if obj.product.image:
+                return request.build_absolute_uri(obj.product.image.url)
+            return None
 
 
 class CreateOrderItemSerializer(serializers.ModelSerializer):
@@ -29,7 +37,7 @@ class CreateOrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
-    customer_name = serializers.ReadOnlyField(source="customer.username")
+    customer_name = serializers.ReadOnlyField(source="customer.user.username")
 
     class Meta:
         model = Order

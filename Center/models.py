@@ -183,4 +183,12 @@ class Gallery(BaseModel):
     def __str__(self):
         return self.title
 
+class Favorite(BaseModel):
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="favorites")
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="favorited_by")
+    class Meta:
+        unique_together = ("customer", "product")
+    def __str__(self):
+        return f"{self.customer.user.username} ❤️ {self.product.name}"
+
 

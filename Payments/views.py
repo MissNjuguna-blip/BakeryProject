@@ -10,44 +10,88 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
 from Center.models import Payment, User, Order, Deliverer
-from .serializer import PaymentCreateSerializer,PaymentSerializer,AdminPaymentSerializer
-from .services import MpesaPayment
+from Payments.serializer import PaymentCreateSerializer,PaymentSerializer,AdminPaymentSerializer
+from Payments.services import MpesaPayment
 
 # Create your views here.
 class MakePaymentViewsets(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
 
-    permission_classes = [permissions.IsAuthenticated]
-    def get_queryset(self):
-        user = self.request.user
-
-        # Admin/Baker can see all payments
-        if user.admin:
-            return Payment.objects.select_related("user", "order")
-
-        # Customers see only their own payments
-        return Payment.objects.filter(user=user).select_related("order")
+    queryset = Payment.objects.all()
 
     def get_serializer_class(self):
         if self.action == "create":
             return PaymentCreateSerializer
-        
-        if User.admin and self.action in ["update", "partial_update"]:
+
+        if self.request.user.is_staff:
             return AdminPaymentSerializer
 
         return PaymentSerializer
 
-    def perform_create(self, serializer):
-        serializer.save()
+    def get_queryset(self):
+        user = self.request.user
 
-    def update(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            raise PermissionDenied("Only the baker can update payments.")
-        return super().update(request, *args, **kwargs)
+        if user.is_staff:
+            return Payment.objects.all()
 
-    def partial_update(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            raise PermissionDenied("Only the baker can update payments.")
-        return super().partial_update(request, *args, **kwargs)
+        return Payment.objects.filter(user=user)
+
+from decimal import Decimal
+
+# @api_view(["POST"])
+# @permission_classes([IsAuthenticated])
+# def pay_deliverer(request):
+
+#     if not request.user.is_staff:
+#         raise PermissionDenied(
+#             "Only administrators can pay deliverers."
+#         )
+
+#     deliverer_id = request.data.get("deliverer_id")
+
+#     try:
+#         deliverer = Deliverer.objects.get(id=deliverer_id)
+#     except Deliverer.DoesNotExist:
+#         return Response(
+#             {"error": "Deliverer not found"},
+#             status=404
+#         )
+
+#     delivered_orders = Order.objects.filter(
+#         deliverer=deliverer,
+#         status="delivered"
+#     )
+
+#     total = sum(
+#         (order.total_amount for order in delivered_orders),
+#         Decimal("0.00")
+#     )
+
+#     commission_rate = Decimal("0.20")
+#     amount_to_pay = total * commission_rate
+
+#     if amount_to_pay <= 0:
+#         return Response(
+#             {"error": "No earnings available for this deliverer."},
+#             status=400
+#         )
+
+#     mpesa = MpesaPayment()
+
+#     result = mpesa.pay_deliverer(
+#         deliverer.phone,
+#         amount_to_pay
+#     )
+
+#     return Response({
+#         "deliverer": deliverer.name,
+#         "phone": deliverer.phone,
+#         "total_orders": delivered_orders.count(),
+#         "total_order_value": str(total),
+#         "commission_rate": "20%",
+#         "amount_to_pay": str(amount_to_pay),
+#         "payment": result,
+#     })
 
 
 # ====== M-PESA ENDPOINTS ======

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework import viewsets,status
-from Admin.serializer import CategorySerializer,AssignDelivererSerializer,DelivererCreateSerializer
+from Admin.serializer import CategorySerializer,AssignDelivererSerializer,DelivererCreateSerializer, DelivererSerializer
 from Center.models import Category
 from Center.models import Admin, Customer, Deliverer, Product,Order
 from rest_framework.views import APIView
@@ -20,32 +20,51 @@ class AdminDashboard(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        try:
-            admin = request.user.admin_profile
 
-            data = {
-                "admin": admin.user.username,
-                "customers": Customer.objects.count(),
-                "deliverers": Deliverer.objects.count(),
-                "products": Product.objects.count(),
-                "orders": Order.objects.count(),
-                "pending_orders": Order.objects.filter(status="pending").count(),
-                "completed_orders": Order.objects.filter(status="delivered").count(),
-            }
+        user = request.user
 
-            return Response(data)
-
-        except Admin.DoesNotExist:
+        # Only ADMIN users can access this dashboard
+        if user.role != "ADMIN":
             return Response(
-                {"error": "Admin profile not found."},
-                status=status.HTTP_404_NOT_FOUND
+                {
+                    "error": "You are not authorized to access the admin dashboard."
+                },
+                status=status.HTTP_403_FORBIDDEN
             )
 
-        except Exception as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        # Get admin profile if it exists
+        admin_profile = getattr(user, "admin_profile", None)
+
+        # Get admin username
+        if admin_profile:
+            admin_username = admin_profile.username
+        else:
+            admin_username = user.username
+
+        data = {
+            "user": {
+                "admin": admin_username,
+                "last_login": user.last_login,
+            },
+
+            "customers": Customer.objects.count(),
+
+            "deliverers": Deliverer.objects.count(),
+
+            "products": Product.objects.count(),
+
+            "orders": Order.objects.count(),
+
+            "pending_orders": Order.objects.filter(
+                status="pending"
+            ).count(),
+
+            "completed_orders": Order.objects.filter(
+                status="delivered"
+            ).count(),
+        }
+
+        return Response(data)
         
 # Create Deliverer
 
@@ -76,6 +95,26 @@ class RegisterDelivererView(APIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+
+        if request.user.role != "ADMIN":
+            return Response(
+                {"error": "Only admins can view deliverers."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        deliverers = Deliverer.objects.all()
+
+        serializer = DelivererSerializer(
+            deliverers,
+            many=True
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
 
 
 

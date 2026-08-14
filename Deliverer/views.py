@@ -19,9 +19,14 @@ class DelivererDashboard(APIView):
             data = {
                 "deliverer": deliverer.name,
                 "available": deliverer.available,
-                "assigned_orders": assigned_orders.count(),
-                "pending_deliveries": assigned_orders.exclude(status="delivered").count(),
+                "assigned_orders_count": assigned_orders.count(),
+                "pending_deliveries": assigned_orders.exclude(status="pending").count(),
                 "completed_deliveries": assigned_orders.filter(status="delivered").count(),
+                "assigned_orders": OrderSerializer(
+                assigned_orders,
+                many=True
+                ).data,
+
             }
 
             return Response(data)

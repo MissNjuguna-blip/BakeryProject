@@ -40,16 +40,18 @@ def SignUp(request):
             role=role,
             
         )
-        if role == 'admin':
+        if role == 'ADMIN':
             Admin.objects.create(
                 user=user,
                 address=request.data.get("address")
 
             )
-        elif role == 'customer':
+        elif role == 'CUSTOMER':
             Customer.objects.create(
                 user=user,
-                address=request.data.get("address")
+                address=request.data.get("address"),
+                phone=request.data.get("phone")
+
                 
             )
         # elif role == 'deliverer':
@@ -122,6 +124,48 @@ def MyProfile(request):
         'role':user.role,
         'profile_data':profile_data
     })
+
+    # Get profile
+    # Get User Profile
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def MyProfile(request):
+    user=request.user
+    print(user)
+
+    profile_data={}
+    if user.role=='ADMIN' and hasattr(user, 'admin_profile'):
+        p=user.admin_profile
+        profile_data = {
+            'username':p.username,
+            'email':p.email,
+            'phone_number':p.phone_number,
+        }
+
+    elif user.role=='DELIVERER' and hasattr(user,'deliverer_profile'):
+        p=user.deliverer_profile
+        profile_data = {
+            'username':p.username,
+            'email':p.email,
+            'phone_number':p.phone_number,
+
+        }
+    elif user.role=='CUSTOMER' and hasattr(user,'customer_profile'):
+            p=user.customer_profile
+            profile_data = {
+                'username':p.user.username,
+                'email':p.user.email,
+                'phone_number':p.phone,
+    
+    }
+    return Response({
+        'id': user.id,
+        'username':user.username,
+        'role':user.role,
+        'profile_data':profile_data
+    })
+
 
 # LogOut
 @api_view(['POST'])
