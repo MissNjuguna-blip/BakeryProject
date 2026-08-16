@@ -103,15 +103,15 @@ def MyProfile(request):
     print(user)
 
     profile_data={}
-    if user.role=='customer' and hasattr(user, 'customer_profile'):
-        p=user.customer_profile
+    if user.role=='CUSTOMER' and hasattr(user, 'customer_profile'):
+        v=user.customer_profile
         profile_data = {
             'phone':v.phone,
             'address':v.address
 
         }
 
-    elif user.role=='deliverer' and hasattr(user,'deliverer_profile'):
+    elif user.role=='DELIVERER' and hasattr(user,'deliverer_profile'):
         v=user.deliverer_profile
         profile_data = {
             'name':v.name,
