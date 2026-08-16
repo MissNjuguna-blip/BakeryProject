@@ -43,7 +43,7 @@ def SignUp(request):
         if role == 'ADMIN':
             Admin.objects.create(
                 user=user,
-                address=request.data.get("address")
+                # address=request.data.get("address")
 
             )
         elif role == 'CUSTOMER':
